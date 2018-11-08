@@ -2,6 +2,7 @@ package search;
 
 import java.util.List;
 
+
 public class ThreadedSearch<T> implements Searcher<T>, Runnable {
 
     private int numThreads;
@@ -29,6 +30,22 @@ public class ThreadedSearch<T> implements Searcher<T>, Runnable {
      * You can assume that the list size is divisible by `numThreads`
      */
     public boolean search(T target, List<T> list) throws InterruptedException {
+    	Thread[] threads = new Thread[numThreads];
+    	   for (int i=0; i<numThreads; ++i) {
+    	      // Create and start thread i
+    	      threads[i] = new Thread(new ThreadedSearch(target, list, begin, end, answer));
+    	      threads[i].start();
+    	   }
+    	   
+    	   for (int i=0; i<numThreads; ++i) {
+    		   System.out.println("this is waiting");
+    		      threads[i].join();
+       		   System.out.println("this is finished");
+
+    		   }
+    	   
+    	   int divider = end/numThreads;
+    	
         /*
          * First construct an instance of the `Answer` inner class. This will
          * be how the threads you're about to create will "communicate". They
@@ -49,12 +66,28 @@ public class ThreadedSearch<T> implements Searcher<T>, Runnable {
          * threads, wait for them to all terminate, and then return the answer
          * in the shared `Answer` instance.
          */
-        return false;
+    	   
+    	if(answer.getAnswer() == true){
+    		return true;	
+    	} else {
+    		return false;
+    	}
     }
 
     public void run() {
+    	System.out.println("this is working");
+    		for(int i = 0; i < list.size(); i++){
+        		if(target == list.get(i)){
+        			//this.answer.setAnswer(true);
+        			answer.setAnswer(true);
+        		}if (target != list.get(i)){
+        			answer.setAnswer(false);
+        		}
+        	}
+    	
+    		
         // Delete this `throw` when you actually implement this method.
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 
     private class Answer {
